@@ -21,7 +21,7 @@ logspdd = {}    #Dictionary for Date:MaxLogins values
 ###################################################################
 
 
-#Filter Process
+#Filter Process | CSV -> Lists
 for line in data_raw:
     if line[0] != "Name":
         data.append(line)
@@ -31,7 +31,7 @@ for line in data_raw:
     else:
         print("Line filtered.")
 
-
+# Cutting time from Dates and save in different lists
 for line in dates_raw:
     dates.append(line[0:10])
     time_v.append(line[12:16])
@@ -40,49 +40,14 @@ for line in dates_raw:
 names_s = set(names)
 dates_s = sorted(set(dates))
 
+#Iterates thru unigue dates and calls function to count maxlogs/day
 for num, n in enumerate(dates_s):
     loginspd = csvlf.loginpd(n, dates, events)
     logspdd[n] = loginspd
 
 
-
+# calls the function & prints the result of max logs overall
 print(f'The total logins at the same time over the timespan of {len(dates_s)} days is: "  {csvlf.maxlogins(events)}')
 
+# calls graph function
 csvlf.showgraph(logspdd)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
