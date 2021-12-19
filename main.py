@@ -1,71 +1,88 @@
 import csv
-
-#GlobalVariables
-names = []
-dates = []
-events = []
-filterX = 0
-u_names = None
-n_filter = None
-total_filtered = []
+import csvlf
 
 
-#Cut datalist into small lists
-def ReadCSV(data):
-    for line in data:
-        if line[0] != "Name":
-            total_filtered.append(line)
-            names.append(line[0])
-            dates.append(line[1])
-            events.append(line[2])
-            u_names = set(names)
-            n_filter = len(names) - len(u_names)
 
-    MaxLogins(events, dates)
+#Read CSV
+data_raw = csvlf.readf()
 
-# Max Logins Overall function
-def MaxLogins(events, dates):
-    counter = 0
-    u_dates = LoginsPerDay(dates)
-    maxlogin = 0
-    for line in events:
-        if line == "login":
-            counter += 1
-            if counter > maxlogin:
-                maxlogin = counter
-        elif line == "logout":
-            counter -= 1
-
-    print(f'Maximal usage of the license simultaneously: {maxlogin} in a span of {len(u_dates)} workdays.')
-#############################
-# NOT FINISHED
-#Logins per day function
-def LoginsPerDay(dates):
-    counter2 = 0
-    dates_filtered = []
-    for line in dates:
-        dates_filtered.append(line[0:10])
-
-    for line in dates_filtered:
-        if line == "03.01.2021":
-            counter2 += 1
-
-    u_dates = set(dates_filtered)
-    u_dates = sorted(u_dates)
-    return u_dates
-
-    #print(u_dates)
-    #print(counter2)
-###############################
+###################################################################
+################### GlobalVariables ###############################
+###################################################################
+data = []       #Placeholder for filtered CSV list
+names = []      #Filtered names from data
+names_s = []    #filtered unique names from data
+dates_raw = []  #unmodified dates with time stamps
+dates = []      #filtered dates dates from raw file
+dates_s = []    #filtered unique dates
+time_v = []     #filtered timestamps only for time statistics
+events = []     #login/logout events filtered
+logspdd = {}    #Dictionary for Date:MaxLogins values
+###################################################################
 
 
-# Read the CSV and cast it as list(string) into data -> Call ReadCSV function
-try:
-    data = list(csv.reader(open('Testdaten.sortiert.csv'), delimiter=','))
-    data[1][1]
-    ReadCSV(data)
+#Filter Process
+for line in data_raw:
+    if line[0] != "Name":
+        data.append(line)
+        names.append(line[0])
+        dates_raw.append(line[1])
+        events.append(line[2])
+    else:
+        print("Line filtered.")
 
-except IndexError:
-    data = list(csv.reader(open('Testdaten.sortiert.csv'), delimiter=';'))
-    data[1][1]
-    ReadCSV(data)
+
+for line in dates_raw:
+    dates.append(line[0:10])
+    time_v.append(line[12:16])
+
+# Sorting / setting uniques
+names_s = set(names)
+dates_s = sorted(set(dates))
+
+for num, n in enumerate(dates_s):
+    loginspd = csvlf.loginpd(n, dates, events)
+    logspdd[n] = loginspd
+
+
+
+print(f'The total logins at the same time over the timespan of {len(dates_s)} days is: "  {csvlf.maxlogins(events)}')
+
+csvlf.showgraph(logspdd)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
